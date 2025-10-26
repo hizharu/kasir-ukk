@@ -13,6 +13,7 @@ if(isset($_SESSION['user_id'])){
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Login - Kasir App</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/png" href="icon.png">
 </head>
 
 <body class="bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen flex justify-center items-center p-4">
