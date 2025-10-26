@@ -13,7 +13,159 @@ $barang = mysqli_query($conn, "SELECT * FROM kasir_app_barang ORDER BY nama_bara
 ?>
 
 <div class="p-6">
+<!-- Notification Toast -->
+<?php if(isset($_GET['success'])): ?>
+<div id="notification-success" class="fixed top-6 right-6 z-50 transform translate-x-full transition-all duration-500 ease-out">
+  <div class="bg-white rounded-xl shadow-2xl overflow-hidden max-w-md">
+    <div class="flex items-start p-4">
+      <div class="flex-shrink-0">
+        <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center animate-bounce-slow">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+      </div>
+      <div class="ml-4 flex-1">
+        <h3 class="text-sm font-semibold text-gray-900">Transaksi Berhasil!</h3>
+        <p class="mt-1 text-sm text-gray-600">
+          ID: #PJ-<?= str_pad($_GET['id'] ?? '000', 6, '0', STR_PAD_LEFT) ?>
+        </p>
+        <?php if(isset($_GET['total'])): ?>
+        <p class="mt-1 text-xs text-gray-500">
+          Total: <span class="font-semibold text-green-600">Rp <?= number_format($_GET['total'], 0, ',', '.') ?></span>
+        </p>
+        <?php endif; ?>
+        <div class="mt-3 flex items-center space-x-2">
+          <button onclick="printReceipt()" class="text-xs bg-green-50 hover:bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-medium transition duration-200 flex items-center space-x-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+            </svg>
+            <span>Cetak</span>
+          </button>
+          <a href="index.php" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-medium transition duration-200">
+            Lihat Semua
+          </a>
+        </div>
+      </div>
+      <button onclick="closeNotification('notification-success')" class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </div>
+    <!-- Progress Bar -->
+    <div class="h-1 bg-gray-100">
+      <div id="progress-bar" class="h-full bg-gradient-to-r from-green-400 to-green-500 transition-all duration-[5000ms] ease-linear" style="width: 100%"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Show notification with animation
+window.addEventListener('load', function() {
+  const notification = document.getElementById('notification-success');
+  if(notification) {
+    setTimeout(() => {
+      notification.classList.remove('translate-x-full');
+    }, 100);
     
+    // Start progress bar
+    setTimeout(() => {
+      document.getElementById('progress-bar').style.width = '0%';
+    }, 100);
+    
+    // Auto hide after 5 seconds
+    setTimeout(() => {
+      closeNotification('notification-success');
+    }, 5000);
+  }
+});
+
+function closeNotification(id) {
+  const notification = document.getElementById(id);
+  notification.classList.add('translate-x-full');
+  setTimeout(() => {
+    const url = new URL(window.location);
+    url.searchParams.delete('success');
+    url.searchParams.delete('id');
+    url.searchParams.delete('total');
+    window.history.replaceState({}, '', url);
+  }, 500);
+}
+
+function printReceipt() {
+  // Add your print logic here
+  alert('Fungsi cetak struk akan ditambahkan');
+}
+</script>
+
+<style>
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.animate-bounce-slow {
+  animation: bounce-slow 2s ease-in-out infinite;
+}
+</style>
+<?php endif; ?>
+
+<?php if(isset($_GET['error'])): ?>
+<div id="notification-error" class="fixed top-6 right-6 z-50 transform translate-x-full transition-all duration-500 ease-out">
+  <div class="bg-white rounded-xl shadow-2xl overflow-hidden max-w-md">
+    <div class="flex items-start p-4">
+      <div class="flex-shrink-0">
+        <div class="w-12 h-12 bg-gradient-to-br from-red-400 to-red-500 rounded-full flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </div>
+      </div>
+      <div class="ml-4 flex-1">
+        <h3 class="text-sm font-semibold text-gray-900">Transaksi Gagal!</h3>
+        <p class="mt-1 text-sm text-gray-600">
+          <?= htmlspecialchars($_GET['error']) ?>
+        </p>
+        <button onclick="closeNotification('notification-error')" class="mt-3 text-xs bg-red-50 hover:bg-red-100 text-red-700 px-3 py-1.5 rounded-lg font-medium transition duration-200">
+          Tutup
+        </button>
+      </div>
+      <button onclick="closeNotification('notification-error')" class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </div>
+    <!-- Progress Bar -->
+    <div class="h-1 bg-gray-100">
+      <div id="progress-bar-error" class="h-full bg-gradient-to-r from-red-400 to-red-500 transition-all duration-[5000ms] ease-linear" style="width: 100%"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.addEventListener('load', function() {
+  const notification = document.getElementById('notification-error');
+  if(notification) {
+    setTimeout(() => {
+      notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    setTimeout(() => {
+      document.getElementById('progress-bar-error').style.width = '0%';
+    }, 100);
+    
+    setTimeout(() => {
+      closeNotification('notification-error');
+    }, 5000);
+  }
+});
+</script>
+<?php endif; ?>
   <!-- Header -->
   <div class="mb-6">
     <div class="flex items-center justify-between">
